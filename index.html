@@ -44,8 +44,6 @@
             layers: [osmLayer] // <--- Define que começa com OSM. Mude para [esriSatellite] se preferir.
         });
 
-
-        // --- DEFINIÇÃO DAS REGRAS DE ESTILO (Paint Rules - Protomaps Moderno) ---
         const styleTP = [
             { 
                 dataLayer: "*", 
@@ -55,7 +53,7 @@
 
         const styleTS = [
             { 
-                dataLayer: "*", 
+                dataLayer: "ceee_ts.pmtiles", 
                 symbolizer: new protomapsL.LineSymbolizer({ color: "red", width: 2 }) 
             }
         ];
@@ -67,50 +65,43 @@
             }
         ];
 
-        // --- CARREGAMENTO DAS CAMADAS PMTILES ---
-        try {
+        var layerTP = protomapsL.leafletLayer({
+            url: 'ceee_tp.pmtiles',
+            paintRules: styleTP
+        });
 
-            var layerTP = protomapsL.leafletLayer({
-                url: 'ceee_tp.pmtiles',
-                paintRules: styleTP
-            });
+        var layerTS = protomapsL.leafletLayer({
+            url: 'ceee_ts.pmtiles',
+            paintRules: styleTS
+        });
 
-            var layerTS = protomapsL.leafletLayer({
-                url: 'ceee_ts.pmtiles',
-                paintRules: styleTS
-            });
+        var layerRM = protomapsL.leafletLayer({
+            url: 'ceee_rm.pmtiles',
+            paintRules: styleRM
+        });
 
-            var layerRM = protomapsL.leafletLayer({
-                url: 'ceee_rm.pmtiles',
-                paintRules: styleRM
-            });
+        // Adicionamos elas ao mapa inicialmente (opcional, podem começar desligadas)
+        layerTP.addTo(map);
+        layerTS.addTo(map);
+        layerRM.addTo(map);
 
-            // Adicionamos elas ao mapa inicialmente (opcional, podem começar desligadas)
-            layerTP.addTo(map);
-            layerTS.addTo(map);
-            layerRM.addTo(map);
+        // --- CONTROLE DE CAMADAS (O Pulo do Gato) ---
 
-            // --- CONTROLE DE CAMADAS (O Pulo do Gato) ---
+        // 1. Mapas Base (Radio Buttons - Escolha Única)
+        const baseMaps = {
+            "Ruas": osmLayer,
+            "Satélite": esriSatellite
+        };
 
-            // 1. Mapas Base (Radio Buttons - Escolha Única)
-            const baseMaps = {
-                "Ruas": osmLayer,
-                "Satélite": esriSatellite
-            };
+        // 2. Mapas de Sobreposição (Checkboxes - Múltipla Escolha)
+        const overlayMaps = {
+            "Primário": layerTP,
+            "Secundário": layerTS,
+            "Ramais": layerRM
+        };
 
-            // 2. Mapas de Sobreposição (Checkboxes - Múltipla Escolha)
-            const overlayMaps = {
-                "Primário": layerTP,
-                "Secundário": layerTS,
-                "Ramais": layerRM
-            };
-
-            // Cria o controle passando os dois objetos
-            L.control.layers(baseMaps, overlayMaps, {collapsed: false}).addTo(map);
-
-        } catch (e) {
-            console.error("Erro ao iniciar camadas vetoriais:", e);
-        }
+        // Cria o controle passando os dois objetos
+        L.control.layers(baseMaps, overlayMaps, {collapsed: false}).addTo(map);
     </script>
 </body>
 </html>

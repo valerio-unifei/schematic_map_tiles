@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Equatorial Trechos v1</title>
+    <title>Equatorial Trechos v2</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -46,7 +46,7 @@
 
         const styleTP = [
             { 
-                dataLayer: "*", 
+                dataLayer: "ceee_tp.pmtiles", 
                 symbolizer: new protomapsL.LineSymbolizer({ color: "black", width: 4 }) 
             }
         ];
@@ -60,7 +60,7 @@
 
         const styleRM = [
             { 
-                dataLayer: "*", 
+                dataLayer: "ceee_rm.pmtiles", 
                 symbolizer: new protomapsL.LineSymbolizer({ color: "green", width: 2 }) 
             }
         ];

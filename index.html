@@ -2,13 +2,14 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>CEEE Equatorial</title>
+    <title>Equatorial CEEE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <style>
         body { margin: 0; padding: 0; }
-        #map { width: 100vw; height: 100vh; }
+        #map { width: 100vw; height: 100vh; background: #333; }
     </style>
 </head>
 <body>
@@ -16,84 +17,95 @@
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/pmtiles@3.0.3/pmtiles.js"></script>
-    <script src="https://unpkg.com/leaflet-pmtiles@1.0.0/leaflet-pmtiles.js"></script>
+    
+    <script src="https://unpkg.com/protomaps-leaflet@1.24.0/dist/protomaps-leaflet.min.js"></script>
 
     <script>
-        // --- 1. Definição dos Mapas Base (Background) ---
+        // --- DEFINIÇÃO DAS CAMADAS BASE (FUNDO) ---
         
-        // Opção A: OpenStreetMap
+        // Opção 1: OpenStreetMap (Mapa de Ruas)
         const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '© OpenStreetMap'
         });
 
-        // Opção B: Satélite (Esri World Imagery)
+        // Opção 2: Esri World Imagery (Satélite)
         const esriSatellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 19, // Importante definir para alinhar com o zoom dos vetores
             attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-GP, and the GIS User Community'
         });
 
-        // --- 2. Inicializar o mapa ---
-        // 'layers: [osmLayer]' define qual mapa começa carregado por padrão
+
+        // --- INICIALIZAÇÃO DO MAPA ---
+        // Inicializamos definindo qual camada base começa ativa
         const map = L.map('map', {
-            center: [-30.0346, -51.2177], // Porto Alegre
+            center: [-30.0346, -51.2177],
             zoom: 13,
-            layers: [osmLayer] 
+            layers: [osmLayer] // <--- Define que começa com OSM. Mude para [esriSatellite] se preferir.
         });
 
-        // --- 3. Camadas PMTiles (Sobreposições) ---
 
-        // Camada 1: ceee_ts.pmtiles (Vermelho)
-        const layerTS = new L.PMTilesLayer("layers/ceee_ts.pmtiles", {
-            style: function(feature) {
-                return {
-                    color: 'red',
-                    fillColor: 'red',
-                    weight: 2,
-                    opacity: 1,
-                    fillOpacity: 0.5,
-                    radius: 4
-                };
+        // --- DEFINIÇÃO DAS REGRAS DE ESTILO (Paint Rules - Protomaps Moderno) ---
+        const styleTS = [
+            { 
+                dataLayer: "*", 
+                symbolizer: new protomapsL.LineSymbolizer({ color: "red", width: 2 }) 
             },
-            attribution: 'Dados CEEE (TS)'
-        });
+            {
+                dataLayer: "*",
+                symbolizer: new protomapsL.CircleSymbolizer({ fill: "red", radius: 4 })
+            }
+        ];
 
-        // Camada 2: ceee_tp.pmtiles (Preto)
-        const layerTP = new L.PMTilesLayer("layers/ceee_tp.pmtiles", {
-            style: function(feature) {
-                return {
-                    color: 'black',
-                    fillColor: 'black',
-                    weight: 2,
-                    opacity: 1,
-                    fillOpacity: 0.8,
-                    radius: 5
-                };
+        const styleTP = [
+            { 
+                dataLayer: "*", 
+                symbolizer: new protomapsL.LineSymbolizer({ color: "black", width: 2 }) 
             },
-            attribution: 'Dados CEEE (TP)'
-        });
+            {
+                dataLayer: "*",
+                symbolizer: new protomapsL.CircleSymbolizer({ fill: "black", radius: 4 })
+            }
+        ];
 
-        // Adiciona as camadas vetoriais ao mapa
-        layerTS.addTo(map);
-        layerTP.addTo(map);
 
-        // --- 4. Controle de Camadas (Menu) ---
-        
-        // Mapas Base (Só pode escolher um por vez -> Radio Button)
-        const baseMaps = {
-            "OpenStreetMap": osmLayer,
-            "Satélite (Esri)": esriSatellite
-        };
+        // --- CARREGAMENTO DAS CAMADAS PMTILES ---
+        try {
+            var layerTS = protomapsL.leafletLayer({
+                url: 'layers/ceee_ts.pmtiles',
+                paintRules: styleTS
+            });
 
-        // Sobreposições (Pode marcar vários -> Checkbox)
-        const overlayMaps = {
-            "Rede TS (Vermelho)": layerTS,
-            "Rede TP (Preto)": layerTP
-        };
+            var layerTP = protomapsL.leafletLayer({
+                url: 'layers/ceee_tp.pmtiles',
+                paintRules: styleTP
+            });
 
-        // Adiciona o menu no canto superior direito
-        L.control.layers(baseMaps, overlayMaps, {collapsed: false}).addTo(map);
+            // Adicionamos elas ao mapa inicialmente (opcional, podem começar desligadas)
+            layerTS.addTo(map);
+            layerTP.addTo(map);
 
+
+            // --- CONTROLE DE CAMADAS (O Pulo do Gato) ---
+
+            // 1. Mapas Base (Radio Buttons - Escolha Única)
+            const baseMaps = {
+                "OpenStreetMap (Ruas)": osmLayer,
+                "Esri Satélite": esriSatellite
+            };
+
+            // 2. Mapas de Sobreposição (Checkboxes - Múltipla Escolha)
+            const overlayMaps = {
+                "Rede TS (Vermelho)": layerTS,
+                "Rede TP (Preto)": layerTP
+            };
+
+            // Cria o controle passando os dois objetos
+            L.control.layers(baseMaps, overlayMaps, {collapsed: false}).addTo(map);
+
+        } catch (e) {
+            console.error("Erro ao iniciar camadas vetoriais:", e);
+        }
     </script>
 </body>
 </html>

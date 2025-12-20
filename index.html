@@ -81,10 +81,11 @@
 
         // --- CARREGAMENTO DAS CAMADAS PMTILES ---
         try {
-            
+
             var layerTP = protomapsL.leafletLayer({
                 url: 'ceee_tp.pmtiles',
-                paintRules: styleTP
+                paintRules: styleTP,
+                debug: true
             });
 
             var layerTS = protomapsL.leafletLayer({

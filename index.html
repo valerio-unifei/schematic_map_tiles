@@ -37,7 +37,7 @@
             layers: [osmLayer] 
         });
 
-        const layerTS = new L.PMTilesLayer("ceee_ts.pmtiles", {
+        const layerTS = new L.PMTilesLayer("layers/ceee_ts.pmtiles", {
             style: function(feature) {
                 return {
                     color: 'red',
@@ -51,7 +51,7 @@
             attribution: 'Secundario'
         });
 
-        const layerTP = new L.PMTilesLayer("ceee_tp.pmtiles", {
+        const layerTP = new L.PMTilesLayer("layers/ceee_tp.pmtiles", {
             style: function(feature) {
                 return {
                     color: 'black',

@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Visualizador CEEE - Híbrido</title>
+    <title>CEEE Equatorial</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
@@ -20,23 +20,30 @@
     <script src="https://unpkg.com/leaflet-pmtiles@1.0.0/leaflet-pmtiles.js"></script>
 
     <script>
-        const osmLayer = L.tileLayer(
-            'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        // --- 1. Definição dos Mapas Base (Background) ---
+        
+        // Opção A: OpenStreetMap
+        const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '© OpenStreetMap'
         });
 
-        const esriSatellite = L.tileLayer(
-            'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        // Opção B: Satélite (Esri World Imagery)
+        const esriSatellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
             attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-GP, and the GIS User Community'
         });
 
+        // --- 2. Inicializar o mapa ---
+        // 'layers: [osmLayer]' define qual mapa começa carregado por padrão
         const map = L.map('map', {
             center: [-30.0346, -51.2177], // Porto Alegre
             zoom: 13,
             layers: [osmLayer] 
         });
 
+        // --- 3. Camadas PMTiles (Sobreposições) ---
+
+        // Camada 1: ceee_ts.pmtiles (Vermelho)
         const layerTS = new L.PMTilesLayer("layers/ceee_ts.pmtiles", {
             style: function(feature) {
                 return {
@@ -48,9 +55,10 @@
                     radius: 4
                 };
             },
-            attribution: 'Secundario'
+            attribution: 'Dados CEEE (TS)'
         });
 
+        // Camada 2: ceee_tp.pmtiles (Preto)
         const layerTP = new L.PMTilesLayer("layers/ceee_tp.pmtiles", {
             style: function(feature) {
                 return {
@@ -62,22 +70,28 @@
                     radius: 5
                 };
             },
-            attribution: 'Primario'
+            attribution: 'Dados CEEE (TP)'
         });
 
+        // Adiciona as camadas vetoriais ao mapa
         layerTS.addTo(map);
         layerTP.addTo(map);
 
+        // --- 4. Controle de Camadas (Menu) ---
+        
+        // Mapas Base (Só pode escolher um por vez -> Radio Button)
         const baseMaps = {
             "OpenStreetMap": osmLayer,
             "Satélite (Esri)": esriSatellite
         };
 
+        // Sobreposições (Pode marcar vários -> Checkbox)
         const overlayMaps = {
-            "Secundario": layerTS,
-            "Primario": layerTP
+            "Rede TS (Vermelho)": layerTS,
+            "Rede TP (Preto)": layerTP
         };
 
+        // Adiciona o menu no canto superior direito
         L.control.layers(baseMaps, overlayMaps, {collapsed: false}).addTo(map);
 
     </script>

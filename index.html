@@ -46,36 +46,24 @@
 
 
         // --- DEFINIÇÃO DAS REGRAS DE ESTILO (Paint Rules - Protomaps Moderno) ---
-        const styleTS = [
+        const styleTP = [
             { 
-                dataLayer: "*", 
-                symbolizer: new protomapsL.LineSymbolizer({ color: "red", width: 2 }) 
-            },
-            {
-                dataLayer: "*",
-                symbolizer: new protomapsL.CircleSymbolizer({ fill: "red", radius: 4 })
+                dataLayer: "Trecho Primário", 
+                symbolizer: new protomapsL.LineSymbolizer({ color: "black", width: 4 }) 
             }
         ];
 
-        const styleTP = [
+        const styleTS = [
             { 
-                dataLayer: "*", 
-                symbolizer: new protomapsL.LineSymbolizer({ color: "black", width: 2 }) 
-            },
-            {
-                dataLayer: "*",
-                symbolizer: new protomapsL.CircleSymbolizer({ fill: "black", radius: 4 })
+                dataLayer: "Trecho Secundário", 
+                symbolizer: new protomapsL.LineSymbolizer({ color: "red", width: 2 }) 
             }
         ];
 
         const styleRM = [
             { 
-                dataLayer: "*", 
+                dataLayer: "Ramais", 
                 symbolizer: new protomapsL.LineSymbolizer({ color: "green", width: 2 }) 
-            },
-            {
-                dataLayer: "*",
-                symbolizer: new protomapsL.CircleSymbolizer({ fill: "green", radius: 4 })
             }
         ];
 

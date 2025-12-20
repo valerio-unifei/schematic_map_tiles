@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Equatorial CEEE</title>
+    <title>Equatorial Trechos</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -32,7 +32,7 @@
         // Opção 2: Esri World Imagery (Satélite)
         const esriSatellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
             maxZoom: 19, // Importante definir para alinhar com o zoom dos vetores
-            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-GP, and the GIS User Community'
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri'
         });
 
 
@@ -68,36 +68,53 @@
             }
         ];
 
+        const styleRM = [
+            { 
+                dataLayer: "*", 
+                symbolizer: new protomapsL.LineSymbolizer({ color: "green", width: 2 }) 
+            },
+            {
+                dataLayer: "*",
+                symbolizer: new protomapsL.CircleSymbolizer({ fill: "green", radius: 4 })
+            }
+        ];
 
         // --- CARREGAMENTO DAS CAMADAS PMTILES ---
         try {
-            var layerTS = protomapsL.leafletLayer({
-                url: 'ceee_ts.pmtiles',
-                paintRules: styleTS
-            });
-
+            
             var layerTP = protomapsL.leafletLayer({
                 url: 'ceee_tp.pmtiles',
                 paintRules: styleTP
             });
 
-            // Adicionamos elas ao mapa inicialmente (opcional, podem começar desligadas)
-            layerTS.addTo(map);
-            layerTP.addTo(map);
+            var layerTS = protomapsL.leafletLayer({
+                url: 'ceee_ts.pmtiles',
+                paintRules: styleTS
+            });
 
+            var layerRM = protomapsL.leafletLayer({
+                url: 'ceee_rm.pmtiles',
+                paintRules: styleRM
+            });
+
+            // Adicionamos elas ao mapa inicialmente (opcional, podem começar desligadas)
+            layerTP.addTo(map);
+            layerTS.addTo(map);
+            layerRM.addTo(map);
 
             // --- CONTROLE DE CAMADAS (O Pulo do Gato) ---
 
             // 1. Mapas Base (Radio Buttons - Escolha Única)
             const baseMaps = {
-                "OpenStreetMap (Ruas)": osmLayer,
-                "Esri Satélite": esriSatellite
+                "Ruas": osmLayer,
+                "Satélite": esriSatellite
             };
 
             // 2. Mapas de Sobreposição (Checkboxes - Múltipla Escolha)
             const overlayMaps = {
-                "Rede TS (Vermelho)": layerTS,
-                "Rede TP (Preto)": layerTP
+                "Primário": layerTP,
+                "Secundário": layerTS,
+                "Ramais": layerRM
             };
 
             // Cria o controle passando os dois objetos
